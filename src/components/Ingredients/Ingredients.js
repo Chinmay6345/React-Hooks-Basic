@@ -30,7 +30,7 @@ const addIngredient=(ingredient)=>{
 }
 const removeIngredient=(ingredientId)=>{
   SetLoading(true);
-  fetch(`https://reacthooks-eb57d.firebaseio.com/ingredients/${ingredientId}.jso`,{
+  fetch(`https://reacthooks-eb57d.firebaseio.com/ingredients/${ingredientId}.json`,{
     method:'DELETE'
   })
   .then(response=>{
