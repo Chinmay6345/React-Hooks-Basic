@@ -1,4 +1,4 @@
-import React,{ useState,useCallback,useReducer } from 'react';
+import React,{ useState,useCallback,useReducer,useMemo } from 'react';
 import IngredientList from './IngredientList';
 import IngredientForm from './IngredientForm';
 import ErrorModal from '../UI/ErrorModal';
@@ -38,7 +38,7 @@ const[httpState,dispatchHttp]=useReducer(httpReducer,{ loading:false,error:null 
 //const[error,SetError]=useState();
 
 
-const addIngredient=(ingredient)=>{
+const addIngredient=useCallback((ingredient)=>{
   //SetLoading(true);
   dispatchHttp({type:'SEND'});
   fetch('https://reacthooks-eb57d.firebaseio.com/ingredients.json',{
@@ -61,8 +61,8 @@ const addIngredient=(ingredient)=>{
     //SetError(error.message);
     dispatchHttp({type:'ERROR', loading:false, errorMessage:'SOMETHING WENT WRONG' });
   });;
-}
-const removeIngredient=(ingredientId)=>{
+},[]);
+const removeIngredientHandler= useCallback((ingredientId)=>{
   //SetLoading(true);
   dispatchHttp({type:'SEND'});
   fetch(`https://reacthooks-eb57d.firebaseio.com/ingredients/${ingredientId}.json`,{
@@ -78,18 +78,24 @@ const removeIngredient=(ingredientId)=>{
     //SetError(error.message);
     dispatchHttp({type:'ERROR', loading:false, errorMessage:'SOMETHING WENT WRONG' });
   });
-}
+},[]);
 
 const filteredIngredientsHandler=useCallback((filteredIngredients)=>{
   //SetIngredients(ingredient);
   dispatch({type:'SET',ingredients:filteredIngredients});
 },[]);
 
-const clearError=()=>{
+const clearError=useCallback(()=>{
   //SetError(null);
   dispatchHttp({type:'CLEAR'});
   //SetLoading(false);
-}
+},[]);
+
+const ingredientlist=useMemo(()=>{
+  return (
+    <IngredientList ingredients={useringredients} onRemoveItem={ removeIngredientHandler }/>
+  )
+},[useringredients,removeIngredientHandler])
 
   return (
     <div className="App">
@@ -100,7 +106,9 @@ const clearError=()=>{
 
       <section>
         <Search onloadIngredients={filteredIngredientsHandler} />
-        <IngredientList ingredients={useringredients} onRemoveItem={ removeIngredient }/>
+        {
+          ingredientlist
+        }
       </section>
     </div>
   );
